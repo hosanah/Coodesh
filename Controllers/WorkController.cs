@@ -11,6 +11,7 @@ namespace Coodesh.Controllers;
 [ApiController]
 public class WorkController : ControllerBase
 {
+
     [HttpGet("/entries/en")]
     public async Task<IActionResult> GetAsyc(
         [FromServices]CoodeshDbContext context,
@@ -51,59 +52,19 @@ public class WorkController : ControllerBase
             if(word == null)
             return NotFound(new ResultViewModel<Word>("0202Z Não foi encontrada nenhuma palavra! Favor tente novamente outra palavra"));
 
-            return Ok(new ResultViewModel<Word>(word));
-        }
-        catch (DbUpdateException ex){
-            return StatusCode(500, new ResultViewModel<List<Word>>("0202X Não foi possível buscar a palavras! Favor contate o suporte"));
-        }
-        catch (Exception ex){
-            return StatusCode(500, new ResultViewModel<List<Word>>("02002C Erro interno do servidor! Favor contate o suporte"));
-        }
-        
-    }
 
-    [HttpGet("/entries/en/:word/favorite")]
-    public async Task<IActionResult> GetByWorkAsyc(
-        [FromServices]CoodeshDbContext context,
-        [FromBody] SearchWordViewModel searchWord,
-        [FromQuery] int page = 0,
-        [FromQuery] int pageSize = 20)
-    {
-        try
-        {
-            var word = await context
-            .Word
-            .AsNoTracking()
-            .Where(e => e.Name.Contains(searchWord.Name))
-            .Skip(page * pageSize)
-            .Take(pageSize)
-            .FirstOrDefaultAsync();
+            var user = await context
+            .User
+            .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
 
-            if(word == null)
-            return NotFound(new ResultViewModel<Word>("0202Z Não foi encontrada nenhuma palavra! Favor tente novamente outra palavra"));
+            if(user == null)
+            return NotFound(new ResultViewModel<FavoriteWord>("0302F Usuário não encontrado"));
 
-            return Ok(new ResultViewModel<Word>(word));
-        }
-        catch (DbUpdateException ex){
-            return StatusCode(500, new ResultViewModel<List<Word>>("0202X Não foi possível buscar a palavras! Favor contate o suporte"));
-        }
-        catch (Exception ex){
-            return StatusCode(500, new ResultViewModel<List<Word>>("02002C Erro interno do servidor! Favor contate o suporte"));
-        }
-        
-    }
 
-    private async void RegisterHistory(
-        [FromServices]CoodeshDbContext context, 
-        RegisterAccessHistoriesViewModel registerAccessHistoriesViewModel)
-    {
-        try
-            {
-                var accessHistory = new AccessHistory()
+            var accessHistory = new AccessHistory()
                 {
                     Id = 0,
-                    User = registerAccessHistoriesViewModel.User,
-                    Word = registerAccessHistoriesViewModel.Word,
+                    Who = user,
                     AccessedWhen = DateTime.UtcNow
                 };
 
@@ -111,11 +72,91 @@ public class WorkController : ControllerBase
                 await context.SaveChangesAsync();
 
 
-            }
-            catch (Exception ex){
-            StatusCode(500, new ResultViewModel<List<Word>>("02002C Erro interno do servidor! Favor contate o suporte"));
+            return Ok(new ResultViewModel<Word>(word));
+        }
+        catch (DbUpdateException ex){
+            return StatusCode(500, new ResultViewModel<List<Word>>("0202X Não foi possível buscar a palavras! Favor contate o suporte"));
+        }
+        catch (Exception ex){
+            return StatusCode(500, new ResultViewModel<List<Word>>("02002C Erro interno do servidor! Favor contate o suporte"));
         }
         
     }
-    
+
+    [HttpPost("/entries/en/:word/favorite")]
+    public async Task<IActionResult> FavoriteWorkAsyc(
+        [FromServices]CoodeshDbContext context,
+        [FromBody] SearchWordViewModel searchWord)
+    {
+        try
+        {
+            var word = await context
+            .Word
+            .AsNoTracking()
+            .Where(e => e.Name.Contains(searchWord.Name))
+            .FirstOrDefaultAsync();
+
+            if(word == null)
+            return NotFound(new ResultViewModel<Word>("0302Z Não foi encontrada nenhuma palavra! Favor tente novamente outra palavra"));
+
+            var user = await context
+            .User
+            .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            if(user == null)
+            return NotFound(new ResultViewModel<FavoriteWord>("0302F Usuário não encontrado"));
+
+
+            var favoriteWork = new FavoriteWord()
+                {
+                    Id = 0,
+                    When = DateTime.Now,
+                    Word = word,
+                    Who = user
+                };
+
+                await context.FavoriteWord.AddAsync(favoriteWork);
+                await context.SaveChangesAsync();
+
+            return Ok(new ResultViewModel<FavoriteWord>(favoriteWork));
+        }
+        catch (DbUpdateException ex){
+            return StatusCode(500, new ResultViewModel<List<Word>>("0302X Não foi possível buscar a palavras! Favor contate o suporte"));
+        }
+        catch (Exception ex){
+            return StatusCode(500, new ResultViewModel<List<Word>>("03002C Erro interno do servidor! Favor contate o suporte"));
+        }
+        
+    }
+
+    [HttpDelete("/entries/en/:word/unfavorite")]
+    public async Task<IActionResult> UnfavoriteWorkAsyc(
+        [FromServices]CoodeshDbContext context,
+        [FromBody] SearchWordViewModel searchWord)
+    {
+        try
+        {
+            var favoriteWord = await context
+            .FavoriteWord
+            .AsNoTracking()
+            .Include(e => e.Word)
+            .Where(e => e.Word.Name.Contains(searchWord.Name))
+            .FirstOrDefaultAsync();
+
+            if(favoriteWord == null)
+            return NotFound(new ResultViewModel<Word>("0402Z Não foi encontrada nenhuma palavra favoritada! Favor tente novamente outra palavra"));
+
+            context.FavoriteWord.Remove(favoriteWord);
+            await context.SaveChangesAsync();
+
+            return Ok(new ResultViewModel<FavoriteWord>(favoriteWord));
+        }
+        catch (DbUpdateException ex){
+            return StatusCode(500, new ResultViewModel<List<Word>>("0302X Não foi possível buscar a palavras! Favor contate o suporte"));
+        }
+        catch (Exception ex){
+            return StatusCode(500, new ResultViewModel<List<Word>>("03002C Erro interno do servidor! Favor contate o suporte"));
+        }
+        
+    }
 }
