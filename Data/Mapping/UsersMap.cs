@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Coodesh.Data.Mappings
 {
-    public class UsuariosMap : IEntityTypeConfiguration<Usuario>
+    public class UsersMap : IEntityTypeConfiguration<User>
     {
-        public void Configure(EntityTypeBuilder<Usuario> builder)
+        public void Configure(EntityTypeBuilder<User> builder)
         {
             // Tabela
-            builder.ToTable("Usuarios");
+            builder.ToTable("User");
 
             // Chave Primária
             builder.HasKey(x => x.Id);
@@ -20,7 +20,7 @@ namespace Coodesh.Data.Mappings
                 .UseIdentityColumn();
 
             // Propriedades
-            builder.Property(x => x.Nome)
+            builder.Property(x => x.Name)
                 .IsRequired()
                 .HasColumnName("Nome")
                 .HasColumnType("NVARCHAR")

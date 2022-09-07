@@ -8,7 +8,7 @@ namespace Coodesh;
 
 public class TokenService
 {
-    public string GenerateToken(Usuario usuario)
+    public string GenerateToken(User user)
     {
         var tokenHanlder = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(Configuration.JwtKey);

@@ -23,25 +23,25 @@ public class AccountController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
 
-        var usuario = new Usuario
+        var user = new User
         {
-            Nome = model.Name,
+            Name = model.Name,
             Email = model.Email
         };
 
-        usuario.PasswordHash = PasswordHasher.Hash(model.Password);
+        user.PasswordHash = PasswordHasher.Hash(model.Password);
 
         try
         {
-            await context.Usuario.AddAsync(usuario);
+            await context.User.AddAsync(user);
             await context.SaveChangesAsync();
 
-            var token = tokenService.GenerateToken(usuario);
+            var token = tokenService.GenerateToken(user);
 
             return Ok(new ResultViewModel<dynamic>(new
             {   
-                id = usuario.Id,
-                name = usuario.Nome, 
+                id = user.Id,
+                name = user.Name, 
                 token
             }));
         }
@@ -64,20 +64,20 @@ public class AccountController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
 
-        var usuario = await context
-            .Usuario
+        var user = await context
+            .User
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Email == model.Email);
 
-        if (usuario == null)
+        if (user == null)
             return StatusCode(401, new ResultViewModel<string>("Usuário ou senha inválidos"));
 
-        if (!PasswordHasher.Verify(usuario.PasswordHash, model.Password))
+        if (!PasswordHasher.Verify(user.PasswordHash, model.Password))
             return StatusCode(401, new ResultViewModel<string>("Usuário ou senha inválidos"));
 
         try
         {
-            var token = tokenService.GenerateToken(usuario);
+            var token = tokenService.GenerateToken(user);
             return Ok(new ResultViewModel<string>(token, null));
         }
         catch
