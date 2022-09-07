@@ -14,32 +14,35 @@ namespace Coodesh.Controllers;
 [ApiController]
 public class AccountController : ControllerBase
 {
-    [HttpPost("v1/accounts/")]
+    [HttpPost("/auth/signup")]
     public async Task<IActionResult> Post(
         [FromBody] RegisterViewModel model,
-        [FromServices] CoodeshDbContext context)
+        [FromServices] CoodeshDbContext context,
+        [FromServices] TokenService tokenService)
     {
         if (!ModelState.IsValid)
             return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
 
         var usuario = new Usuario
         {
-            Nome = model.Nome,
+            Nome = model.Name,
             Email = model.Email
         };
 
-        var password = PasswordGenerator.Generate(25);
-        usuario.PasswordHash = PasswordHasher.Hash(password);
+        usuario.PasswordHash = PasswordHasher.Hash(model.Password);
 
         try
         {
             await context.Usuario.AddAsync(usuario);
             await context.SaveChangesAsync();
 
+            var token = tokenService.GenerateToken(usuario);
+
             return Ok(new ResultViewModel<dynamic>(new
-            {
-                usuario = usuario.Email, 
-                password
+            {   
+                id = usuario.Id,
+                name = usuario.Nome, 
+                token
             }));
         }
         catch (DbUpdateException)
