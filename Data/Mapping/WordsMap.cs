@@ -26,12 +26,6 @@ namespace Coodesh.Data.Mappings
                 .HasColumnType("NVARCHAR")
                 .HasMaxLength(80);
 
-             // Propriedades
-            builder.Property(x => x.Favorite)
-                .IsRequired()
-                .HasColumnName("Favorite")
-                .HasColumnType("NUMERIC")
-                .HasMaxLength(1);
 
         }
     }

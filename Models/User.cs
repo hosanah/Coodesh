@@ -6,5 +6,7 @@
         public string Name { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; }
+        public List<AccessHistory> AccessHistories { get; set; }
+        public List<FavoriteWord> FavoriteWords { get; set; }
     }
  }
