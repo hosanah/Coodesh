@@ -83,17 +83,17 @@ public class WorkController : ControllerBase
         
     }
 
-    [HttpPost("/entries/en/:word/favorite")]
+    [HttpPost("/entries/en/{wordFromRoute}/favorite")]
     public async Task<IActionResult> FavoriteWorkAsyc(
         [FromServices]CoodeshDbContext context,
-        [FromBody] SearchWordViewModel searchWord)
+        [FromRoute] string wordFromRoute)
     {
         try
         {
             var word = await context
             .Word
             .AsNoTracking()
-            .Where(e => e.Name.Contains(searchWord.Name))
+            .Where(e => e.Name.Contains(wordFromRoute))
             .FirstOrDefaultAsync();
 
             if(word == null)

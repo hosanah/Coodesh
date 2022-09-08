@@ -44,8 +44,7 @@ namespace Coodesh.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     WhoId = table.Column<int>(type: "int", nullable: false),
-                    AccessedWhen = table.Column<DateTime>(type: "SMALLDATETIME", maxLength: 60, nullable: false, defaultValueSql: "GETDATE()"),
-                    WordId = table.Column<int>(type: "int", nullable: true)
+                    AccessedWhen = table.Column<DateTime>(type: "SMALLDATETIME", maxLength: 60, nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -56,11 +55,6 @@ namespace Coodesh.Migrations
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AccessHistory_Word_WordId",
-                        column: x => x.WordId,
-                        principalTable: "Word",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -94,11 +88,6 @@ namespace Coodesh.Migrations
                 name: "IX_AccessHistory_WhoId",
                 table: "AccessHistory",
                 column: "WhoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AccessHistory_WordId",
-                table: "AccessHistory",
-                column: "WordId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FavoriteWord_WhoId",

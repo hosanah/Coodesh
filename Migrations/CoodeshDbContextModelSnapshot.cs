@@ -40,14 +40,9 @@ namespace Coodesh.Migrations
                     b.Property<int>("WhoId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WordId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("WhoId");
-
-                    b.HasIndex("WordId");
 
                     b.ToTable("AccessHistory", (string)null);
                 });
@@ -141,10 +136,6 @@ namespace Coodesh.Migrations
                         .IsRequired()
                         .HasConstraintName("FK_Access_User");
 
-                    b.HasOne("Coodesh.Models.Word", null)
-                        .WithMany("AccessHistories")
-                        .HasForeignKey("WordId");
-
                     b.Navigation("Who");
                 });
 
@@ -178,8 +169,6 @@ namespace Coodesh.Migrations
 
             modelBuilder.Entity("Coodesh.Models.Word", b =>
                 {
-                    b.Navigation("AccessHistories");
-
                     b.Navigation("FavoriteWords");
                 });
 #pragma warning restore 612, 618

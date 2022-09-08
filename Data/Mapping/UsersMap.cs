@@ -34,7 +34,8 @@ namespace Coodesh.Data.Mappings
                 .HasMaxLength(80);
 
             //Propriedades
-            builder.Property(x => x.PasswordHash).IsRequired()
+            builder.Property(x => x.PasswordHash)
+                .IsRequired()
                 .HasColumnName("PasswordHash")
                 .HasColumnType("VARCHAR")
                 .HasMaxLength(255);
