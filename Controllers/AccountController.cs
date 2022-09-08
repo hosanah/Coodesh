@@ -55,7 +55,7 @@ public class AccountController : ControllerBase
         }
     }
 
-    [HttpPost("/auth/signup")]
+    [HttpPost("/auth/signin")]
     public async Task<IActionResult> Login(
         [FromBody] LoginViewModel model,
         [FromServices] CoodeshDbContext context,

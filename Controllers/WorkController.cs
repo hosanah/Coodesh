@@ -32,10 +32,10 @@ public class WorkController : ControllerBase
         
     }
 
-    [HttpGet("/entries/en")]
+    [HttpGet("/entries/en/{wordFromRoute}")]
     public async Task<IActionResult> GetByWorkAsyc(
         [FromServices]CoodeshDbContext context,
-        [FromBody] SearchWordViewModel searchWord,
+        [FromRoute] string wordFromRoute,
         [FromQuery] int page = 0,
         [FromQuery] int pageSize = 20)
     {
@@ -44,7 +44,7 @@ public class WorkController : ControllerBase
             var word = await context
             .Word
             .AsNoTracking()
-            .Where(e => e.Name.Contains(searchWord.Name))
+            .Where(e => e.Name.Contains(wordFromRoute))
             .Skip(page * pageSize)
             .Take(pageSize)
             .FirstOrDefaultAsync();
