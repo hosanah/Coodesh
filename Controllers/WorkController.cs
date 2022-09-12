@@ -55,7 +55,7 @@ public class WorkController : ControllerBase
 
             var user = await context
             .User
-            .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            .FirstOrDefaultAsync(x => x.Id == Convert.ToInt32(User.GetId()));
 
             if(user == null)
             return NotFound(new ResultViewModel<FavoriteWord>("0302F Usuário não encontrado"));
@@ -101,7 +101,7 @@ public class WorkController : ControllerBase
 
             var user = await context
             .User
-            .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+            .FirstOrDefaultAsync(x => x.Id == Convert.ToInt32(User.GetId()));
 
             if(user == null)
             return NotFound(new ResultViewModel<FavoriteWord>("0302F Usuário não encontrado"));
